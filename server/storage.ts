@@ -1,38 +1,43 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { type Prospect, type InsertProspect, prospects } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getAllProspects(): Promise<Prospect[]>;
+  getProspect(id: number): Promise<Prospect | undefined>;
+  createProspect(data: InsertProspect): Promise<Prospect>;
+  updateProspect(id: number, data: Partial<InsertProspect>): Promise<Prospect | undefined>;
+  deleteProspect(id: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async getAllProspects(): Promise<Prospect[]> {
+    return await db.select().from(prospects).orderBy(desc(prospects.createdAt));
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getProspect(id: number): Promise<Prospect | undefined> {
+    const [result] = await db.select().from(prospects).where(eq(prospects.id, id));
+    return result;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async createProspect(data: InsertProspect): Promise<Prospect> {
+    const [result] = await db.insert(prospects).values(data).returning();
+    return result;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async updateProspect(id: number, data: Partial<InsertProspect>): Promise<Prospect | undefined> {
+    const [result] = await db
+      .update(prospects)
+      .set(data)
+      .where(eq(prospects.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteProspect(id: number): Promise<boolean> {
+    const result = await db.delete(prospects).where(eq(prospects.id, id)).returning();
+    return result.length > 0;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
