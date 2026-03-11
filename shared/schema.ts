@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -22,6 +22,7 @@ export const prospects = pgTable("prospects", {
   status: text("status").notNull().default("Bookmarked"),
   interestLevel: text("interest_level").notNull().default("Medium"),
   salary: text("salary"),
+  isHireHaas: boolean("is_hire_haas").notNull().default(false),
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -45,6 +46,7 @@ export const insertProspectSchema = createInsertSchema(prospects).omit({
     .refine((val) => !val || SALARY_REGEX.test(val), {
       message: "Salary must be in $XXX,XXX format (e.g. $120,000)",
     }),
+  isHireHaas: z.boolean().default(false),
 });
 
 export type InsertProspect = z.infer<typeof insertProspectSchema>;
