@@ -53,7 +53,7 @@ A single PostgreSQL table stores all job prospects. No joins, no relations.
 | `id`            | `SERIAL`     | Primary key, auto-increment         |
 | `company_name`  | `TEXT`        | NOT NULL                            |
 | `role_title`    | `TEXT`        | NOT NULL                            |
-| `job_url`       | `TEXT`        | Nullable                            |
+| `job_link`      | `TEXT`        | Nullable                            |
 | `status`        | `TEXT`        | NOT NULL, default `'Bookmarked'`    |
 | `interest_level`| `TEXT`        | NOT NULL, default `'Medium'`        |
 | `notes`         | `TEXT`        | Nullable                            |
@@ -134,7 +134,7 @@ Browser (React)
 To populate the database with sample prospects, run the following SQL against your PostgreSQL database:
 
 ```sql
-INSERT INTO prospects (company_name, role_title, job_url, status, interest_level, notes)
+INSERT INTO prospects (company_name, role_title, job_link, status, interest_level, notes)
 SELECT * FROM (VALUES
   (
     'Google',
@@ -176,7 +176,7 @@ SELECT * FROM (VALUES
     'Low',
     'Did not move past the initial screen. Will try again next recruiting cycle.'
   )
-) AS v(company_name, role_title, job_url, status, interest_level, notes)
+) AS v(company_name, role_title, job_link, status, interest_level, notes)
 WHERE NOT EXISTS (SELECT 1 FROM prospects LIMIT 1);
 ```
 
