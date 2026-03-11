@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Prospect } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Trash2, Pencil, Flame, ThumbsUp, Minus } from "lucide-react";
+import { ExternalLink, Trash2, Pencil, Flame, ThumbsUp, Minus, GraduationCap } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -104,7 +104,15 @@ export function ProspectCard({ prospect }: { prospect: Prospect }) {
         </div>
 
         <div className="flex items-center justify-between gap-1.5 flex-wrap">
-          <InterestIndicator level={prospect.interestLevel} />
+          <div className="flex items-center gap-1.5">
+            <InterestIndicator level={prospect.interestLevel} />
+            {prospect.isHireHaas && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400" data-testid={`badge-hire-haas-${prospect.id}`}>
+                <GraduationCap className="w-3 h-3" />
+                HireHaas
+              </span>
+            )}
+          </div>
           <span className="text-xs font-medium text-muted-foreground" data-testid={`text-salary-${prospect.id}`}>
             {prospect.salary || "-"}
           </span>

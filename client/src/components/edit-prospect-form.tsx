@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface EditProspectFormProps {
   prospect: Prospect;
@@ -42,6 +43,7 @@ export function EditProspectForm({ prospect, onSuccess }: EditProspectFormProps)
       status: prospect.status as InsertProspect["status"],
       interestLevel: prospect.interestLevel as InsertProspect["interestLevel"],
       salary: prospect.salary ?? "",
+      isHireHaas: prospect.isHireHaas ?? false,
       notes: prospect.notes ?? "",
     },
   });
@@ -180,6 +182,23 @@ export function EditProspectForm({ prospect, onSuccess }: EditProspectFormProps)
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="isHireHaas"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-2.5 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  data-testid="checkbox-edit-hire-haas"
+                />
+              </FormControl>
+              <FormLabel className="font-normal cursor-pointer">HireHaas (Haas alumni hiring)</FormLabel>
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}

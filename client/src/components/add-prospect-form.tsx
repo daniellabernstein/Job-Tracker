@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
   const { toast } = useToast();
@@ -37,6 +38,7 @@ export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
       status: "Bookmarked",
       interestLevel: "Medium",
       salary: "",
+      isHireHaas: false,
       notes: "",
     },
   });
@@ -176,6 +178,23 @@ export function AddProspectForm({ onSuccess }: { onSuccess?: () => void }) {
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="isHireHaas"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-2.5 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  data-testid="checkbox-hire-haas"
+                />
+              </FormControl>
+              <FormLabel className="font-normal cursor-pointer">HireHaas (Haas alumni hiring)</FormLabel>
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}

@@ -40,6 +40,7 @@ export async function registerRoutes(
     if (body.jobUrl !== undefined) updates.jobUrl = body.jobUrl;
     if (body.notes !== undefined) updates.notes = body.notes;
     if (body.salary !== undefined) updates.salary = body.salary || null;
+    if (body.isHireHaas !== undefined) updates.isHireHaas = Boolean(body.isHireHaas);
 
     if (body.status !== undefined) {
       if (!STATUSES.includes(body.status)) {

@@ -4,7 +4,7 @@ import type { Prospect } from "@shared/schema";
 import { STATUSES, INTEREST_LEVELS } from "@shared/schema";
 import { ProspectCard } from "@/components/prospect-card";
 import { AddProspectForm } from "@/components/add-prospect-form";
-import { Briefcase, Plus } from "lucide-react";
+import { Briefcase, Plus, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,17 +34,23 @@ function KanbanColumn({
   status,
   prospects,
   isLoading,
+  hireHaasActive,
 }: {
   status: string;
   prospects: Prospect[];
   isLoading: boolean;
+  hireHaasActive: boolean;
 }) {
   const [interestFilter, setInterestFilter] = useState<InterestFilter>("All");
 
+  const hireHaasFiltered = hireHaasActive
+    ? prospects.filter((p) => p.isHireHaas)
+    : prospects;
+
   const visibleProspects =
     interestFilter === "All"
-      ? prospects
-      : prospects.filter((p) => p.interestLevel === interestFilter);
+      ? hireHaasFiltered
+      : hireHaasFiltered.filter((p) => p.interestLevel === interestFilter);
 
   const columnSlug = status.replace(/\s+/g, "-").toLowerCase();
 
@@ -92,7 +98,11 @@ function KanbanColumn({
           ) : visibleProspects.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center" data-testid={`empty-${columnSlug}`}>
               <p className="text-xs text-muted-foreground">
-                {prospects.length === 0 ? "No prospects" : `No ${interestFilter.toLowerCase()} interest`}
+                {prospects.length === 0
+                  ? "No prospects"
+                  : hireHaasActive && hireHaasFiltered.length === 0
+                  ? "No HireHaas prospects"
+                  : `No ${interestFilter.toLowerCase()} interest`}
               </p>
             </div>
           ) : (
@@ -108,6 +118,7 @@ function KanbanColumn({
 
 export default function Home() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [hireHaasActive, setHireHaasActive] = useState(false);
 
   const { data: prospects, isLoading } = useQuery<Prospect[]>({
     queryKey: ["/api/prospects"],
@@ -141,20 +152,34 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" data-testid="button-add-prospect">
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  Add Prospect
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>Add New Prospect</DialogTitle>
-                </DialogHeader>
-                <AddProspectForm onSuccess={() => setDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setHireHaasActive((prev) => !prev)}
+                data-testid="button-filter-hire-haas"
+                className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                  hireHaasActive
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground"
+                }`}
+              >
+                <GraduationCap className="w-3.5 h-3.5" />
+                HireHaas
+              </button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" data-testid="button-add-prospect">
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    Add Prospect
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Add New Prospect</DialogTitle>
+                  </DialogHeader>
+                  <AddProspectForm onSuccess={() => setDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </header>
@@ -167,6 +192,7 @@ export default function Home() {
               status={status}
               prospects={groupedByStatus[status] || []}
               isLoading={isLoading}
+              hireHaasActive={hireHaasActive}
             />
           ))}
         </div>
