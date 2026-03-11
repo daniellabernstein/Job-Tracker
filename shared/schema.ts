@@ -21,9 +21,12 @@ export const prospects = pgTable("prospects", {
   jobUrl: text("job_url"),
   status: text("status").notNull().default("Bookmarked"),
   interestLevel: text("interest_level").notNull().default("Medium"),
+  salary: text("salary"),
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const SALARY_REGEX = /^\$\d{1,3}(,\d{3})*$/;
 
 export const insertProspectSchema = createInsertSchema(prospects).omit({
   id: true,
@@ -35,6 +38,13 @@ export const insertProspectSchema = createInsertSchema(prospects).omit({
   interestLevel: z.enum(INTEREST_LEVELS).default("Medium"),
   jobUrl: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
+  salary: z
+    .string()
+    .optional()
+    .nullable()
+    .refine((val) => !val || SALARY_REGEX.test(val), {
+      message: "Salary must be in $XXX,XXX format (e.g. $120,000)",
+    }),
 });
 
 export type InsertProspect = z.infer<typeof insertProspectSchema>;
