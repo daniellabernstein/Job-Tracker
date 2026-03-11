@@ -103,8 +103,11 @@ export function ProspectCard({ prospect }: { prospect: Prospect }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center justify-between gap-1.5 flex-wrap">
           <InterestIndicator level={prospect.interestLevel} />
+          <span className="text-xs font-medium text-muted-foreground" data-testid={`text-salary-${prospect.id}`}>
+            {prospect.salary || "-"}
+          </span>
         </div>
 
         {prospect.jobUrl && (
